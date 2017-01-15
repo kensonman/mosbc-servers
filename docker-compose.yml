@@ -1,0 +1,44 @@
+version: "2"
+services:
+    mysql:
+        image: "mysql:5"
+        container_name: "WebSites-MySQL"
+        environment:
+            - MYSQL_ROOT_PASSWORD=wJ5VbnUgAQWmWWPAqb3RrtXf
+        volumes:
+            - ./mysql:/var/lib/mysql
+    tommy:
+        image: 'kensonman/nginx-php7fpm:latest'
+        container_name: 'tommy.mosbc.org.hk'
+        volumes:
+            - ./tommy:/usr/share/nginx/html:ro
+        command: '/startup'
+    cody:
+        image: 'kensonman/nginx-php7fpm:latest'
+        container_name: 'cody.mosbc.org.hk'
+        volumes:
+            - ./cody:/usr/share/nginx/html:ro
+        command: '/startup'
+    test:
+        image: 'kensonman/nginx-php7fpm:latest'
+        container_name: 'test.mosbc.org.hk'
+        volumes:
+            - ./test:/usr/share/nginx/html:ro
+        command: '/startup'
+    haproxy:
+        image: "haproxy:1.5"
+        container_name: haproxy
+        volumes:
+            - ./haproxy/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+        ports:
+            - "80:80"
+            - "443:443"
+        tty: true
+        links:
+            - tommy:tommy.mosbc.org.hk
+            - cody:cody.mosbc.org.hk
+            - test:test.mosbc.org.hk
+        depends_on:
+            - tommy
+            - cody
+            - test
